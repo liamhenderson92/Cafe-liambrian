@@ -12,11 +12,22 @@ class CafeSpec extends WordSpec with MustMatchers {
       Cafe.heat(Water()) mustEqual Water(40D)
     }
 
-    "return 'Ground Coffee of Arabica beans' when given 'Arabica beans'" in {
-      Cafe.grind("Arabica beans") mustEqual "Ground Coffee of Arabica beans"
+    "return 'GroundCoffee' when given 'Arabica Beans'" in {
+      Cafe.grind("Arabica Beans") mustEqual "GroundCoffee"
     }
 
+    "return 'Incorrect Beans' when given 'Baked Beans'" in {
+      Cafe.grind("Baked Beans") mustEqual "Incorrect Beans"
+    }
 
+    "return 'FrothedMilk' when given 'WholeMilk" in {
+      Cafe.frothMilk("WholeMilk") mustEqual "FrothedMilk"
+    }
+
+    "throw new IllegalArgumentException when given SemiSkimmedMilk" in {
+      val e = intercept[FrothingException] {
+        Cafe.frothMilk("SemiSkimmedMilk") mustEqual "You need to use Whole Milk"
+      }
+    }
   }
-
 }
