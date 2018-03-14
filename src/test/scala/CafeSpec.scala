@@ -24,10 +24,20 @@ class CafeSpec extends WordSpec with MustMatchers {
       Cafe.frothMilk("WholeMilk") mustEqual "FrothedMilk"
     }
 
-    "throw new IllegalArgumentException when given SemiSkimmedMilk" in {
+    "throw new 'FrothingException' when given 'SemiSkimmedMilk'" in {
       val e = intercept[FrothingException] {
         Cafe.frothMilk("SemiSkimmedMilk") mustEqual "You need to use Whole Milk"
       }
+    }
+
+    "throw new 'BrewingException' when given water with a temperature less than 40" in {
+      val e = intercept[BrewingException] {
+        Cafe.brew(Water(5), "GroundCoffee") mustEqual "The water is too cold"
+      }
+    }
+
+    "return Coffee when given water 40 degrees or more and Ground Coffee" in {
+      Cafe.brew(Water(40), "GroundCoffee") mustEqual "Coffee"
     }
   }
 }
