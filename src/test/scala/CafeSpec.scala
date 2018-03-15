@@ -18,6 +18,8 @@ class CafeSpec extends WordSpec with MustMatchers {
     }
 
     "return 'Incorrect Beans' when given 'Baked Beans'" in {
+
+      final case class BakedBeans() extends Beans
       intercept[GrindingException] {
         Cafe.grind(BakedBeans()) mustEqual "Incorrect Beans"
       }
