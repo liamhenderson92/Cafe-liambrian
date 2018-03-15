@@ -1,54 +1,61 @@
 
-case class Water(temperature : Double = 0)
-case class FrothingException(msg: String) extends Exception
-case class BrewingException(msg: String) extends Exception
+case class Water(temperature: Double = 0)
+
+case class FrothingException(msg: String) extends Exception(msg)
+
+case class BrewingException(msg: String) extends Exception(msg)
+
+case class GrindingException(msg: String) extends Exception(msg)
 
 object Cafe extends App {
 
   type CoffeeBeans = String
   type GroundCoffee = String
-  type Milk = String
-  type FrothedMilk = String
+
+  trait Milk
+  trait FrothedMilk extends Milk
+  final case class FrothedWholeMilk() extends FrothedMilk
+
+  final case class WholeMilk() extends Milk
+  final case class SemiSkimmedMilk() extends Milk
+
   case class Coffee(water: Water, groundCoffee: GroundCoffee, milk: Option[FrothedMilk] = None) {
-    def addMilk(FrothedMilk : String) : Coffee = this.copy(water,groundCoffee,Some("FrothedMilk"))
+    def addMilk(frothedMilk : FrothedMilk ): Coffee = this.copy(water, groundCoffee, Some(FrothedWholeMilk()))
   }
 
   def heat(water: Water, temperature: Double = 40D): Water = {
     water.copy(temperature)
-
   }
 
   def grind(beans: CoffeeBeans): GroundCoffee = {
     beans match {
       case "Arabica Beans" => "GroundCoffee"
-      case _ => "Incorrect Beans"
+      case _ => throw GrindingException("Incorrect Beans")
     }
   }
 
   def frothMilk(milk: Milk): FrothedMilk = {
     milk match {
-      case "WholeMilk" => "FrothedMilk"
+      case WholeMilk() => FrothedWholeMilk()
       case _ => throw FrothingException("You need to use Whole Milk")
     }
   }
 
   def brew(water: Water, coffee: GroundCoffee, milk: Option[FrothedMilk] = None): Coffee = {
-    water match {
-      case x if x.temperature >= 40  && milk.isEmpty =>
+    (water, milk) match {
+      case (w, Some(FrothedWholeMilk())) if w.temperature >= 40 =>
+        println(s"You	have brewed	the	following coffee: Coffee at ${water.temperature - 5} degrees with Whole Milk")
+        Coffee(Water(water.temperature - 5), coffee, Some(FrothedWholeMilk()))
+      case (w, _) if w.temperature >= 40 =>
         println(s"You	have brewed	the	following coffee: Coffee at ${water.temperature} without milk")
-        Coffee(water,coffee)
-      case y if y.temperature >= 40  && milk.contains("FrothedMilk") =>
-        println(s"You	have brewed	the	following coffee: Coffee at ${water.temperature-5} degrees with Whole Milk")
-
-        Coffee(Water(water.temperature - 5),coffee,Some("FrothedMilk"))
-      case _ => throw BrewingException("The water is too cold")
+        Coffee(water, coffee)
+      case (_,_) => throw BrewingException("The water is too cold")
     }
   }
 
-
-    val groundCoffee = grind("Arabica Beans")
-    val heatedWater = heat(Water(40))
-    val frothyMilk = frothMilk("WholeMilk")
+  val groundCoffee = grind("Arabica Beans")
+  val heatedWater = heat(Water(20))
+  val frothyMilk = frothMilk(WholeMilk())
 
   brew(heatedWater, groundCoffee, Some(frothyMilk))
   brew(heatedWater, groundCoffee)
