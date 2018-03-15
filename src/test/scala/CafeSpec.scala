@@ -1,3 +1,4 @@
+import Cafe.Coffee
 import org.scalatest.{MustMatchers, WordSpec}
 
 class CafeSpec extends WordSpec with MustMatchers {
@@ -37,7 +38,11 @@ class CafeSpec extends WordSpec with MustMatchers {
     }
 
     "return Coffee when given water 40 degrees or more and Ground Coffee" in {
-      Cafe.brew(Water(40), "GroundCoffee") mustEqual "Coffee"
+      Cafe.brew(Water(40), "GroundCoffee") mustEqual Coffee(Water(40),"GroundCoffee")
+    }
+
+    "return White Coffee when given water 40 degrees or more and Ground Coffee" in {
+      Cafe.brew(Water(40), "GroundCoffee", Some("FrothedMilk")) mustEqual Coffee(Water(35),"GroundCoffee",Some("FrothedMilk"))
     }
   }
 }
