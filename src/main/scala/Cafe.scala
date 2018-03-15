@@ -1,16 +1,9 @@
-
 case class Water(temperature: Double = 0)
-
 case class FrothingException(msg: String) extends Exception(msg)
-
 case class BrewingException(msg: String) extends Exception(msg)
-
 case class GrindingException(msg: String) extends Exception(msg)
 
 object Cafe extends App {
-
-  type CoffeeBeans = String
-  type GroundCoffee = String
 
   trait Milk
   trait FrothedMilk extends Milk
@@ -18,6 +11,13 @@ object Cafe extends App {
 
   final case class WholeMilk() extends Milk
   final case class SemiSkimmedMilk() extends Milk
+
+  trait Beans
+  trait CoffeeBeans extends Beans
+  case class ArabicaBeans() extends CoffeeBeans
+  final case class BakedBeans() extends Beans
+
+  final case class GroundCoffee() extends CoffeeBeans
 
   case class Coffee(water: Water, groundCoffee: GroundCoffee, milk: Option[FrothedMilk] = None) {
     def addMilk(frothedMilk : FrothedMilk ): Coffee = this.copy(water, groundCoffee, Some(FrothedWholeMilk()))
@@ -27,9 +27,9 @@ object Cafe extends App {
     water.copy(temperature)
   }
 
-  def grind(beans: CoffeeBeans): GroundCoffee = {
+  def grind(beans: Beans): GroundCoffee = {
     beans match {
-      case "Arabica Beans" => "GroundCoffee"
+      case ArabicaBeans() => GroundCoffee()
       case _ => throw GrindingException("Incorrect Beans")
     }
   }
@@ -53,7 +53,7 @@ object Cafe extends App {
     }
   }
 
-  val groundCoffee = grind("Arabica Beans")
+  val groundCoffee = grind(ArabicaBeans())
   val heatedWater = heat(Water(20))
   val frothyMilk = frothMilk(WholeMilk())
 

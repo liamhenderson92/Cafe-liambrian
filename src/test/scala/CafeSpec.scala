@@ -1,4 +1,4 @@
-import Cafe.{Coffee, FrothedWholeMilk, SemiSkimmedMilk, WholeMilk}
+import Cafe._
 import org.scalatest.{MustMatchers, WordSpec}
 
 class CafeSpec extends WordSpec with MustMatchers {
@@ -14,12 +14,12 @@ class CafeSpec extends WordSpec with MustMatchers {
     }
 
     "return 'GroundCoffee' when given 'Arabica Beans'" in {
-      Cafe.grind("Arabica Beans") mustEqual "GroundCoffee"
+      Cafe.grind(ArabicaBeans()) mustBe GroundCoffee()
     }
 
     "return 'Incorrect Beans' when given 'Baked Beans'" in {
       intercept[GrindingException] {
-        Cafe.grind("Baked Beans") mustEqual "Incorrect Beans"
+        Cafe.grind(BakedBeans()) mustEqual "Incorrect Beans"
       }
     }
 
@@ -35,16 +35,16 @@ class CafeSpec extends WordSpec with MustMatchers {
 
     "throw new 'BrewingException' when given water with a temperature less than 40" in {
       intercept[BrewingException] {
-        Cafe.brew(Water(5), "GroundCoffee") mustEqual "The water is too cold"
+        Cafe.brew(Water(5), GroundCoffee()) mustEqual "The water is too cold"
       }
     }
 
     "return Coffee when given water 40 degrees or more and Ground Coffee" in {
-      Cafe.brew(Water(40), "GroundCoffee") mustEqual Coffee(Water(40),"GroundCoffee")
+      Cafe.brew(Water(40), GroundCoffee()) mustEqual Coffee(Water(40),GroundCoffee())
     }
 
     "return White Coffee at 35 degrees when given water of 40 degrees and Ground Coffee" in {
-      Cafe.brew(Water(40), "GroundCoffee", Some(FrothedWholeMilk())) mustEqual Coffee(Water(35),"GroundCoffee",Some(FrothedWholeMilk()))
+      Cafe.brew(Water(40), GroundCoffee(), Some(FrothedWholeMilk())) mustEqual Coffee(Water(35),GroundCoffee(),Some(FrothedWholeMilk()))
     }
   }
 }
