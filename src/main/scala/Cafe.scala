@@ -29,7 +29,7 @@ case class Coffee(water: Water, groundCoffee: GroundCoffee, milk: Option[Frothed
 
 object Cafe extends App {
 
-  implicit val ec : ExecutionContext = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
+  implicit def ec : ExecutionContext = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
 
   def heat(water: Water, temperature: Double = 40D): Future[Water] = Future {
     Thread.sleep(Random.nextInt(2000))
