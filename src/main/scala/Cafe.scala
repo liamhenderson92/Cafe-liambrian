@@ -60,10 +60,10 @@ object Cafe extends App {
   def brew(water: Water, coffee: GroundCoffee, milk: Option[FrothedMilk] = None): Future[Coffee] = Future {
     (water, milk) match {
       case (w, Some(FrothedWholeMilk())) if w.temperature >= 40 =>
-        println(s"You	have brewed	the	following coffee: Coffee at ${water.temperature - 5} degrees with Whole Milk")
+        println(s"You have brewed the following coffee: Coffee at ${water.temperature - 5} degrees with Whole Milk")
         Coffee(water, coffee).addMilk(FrothedWholeMilk())
       case (w, _) if w.temperature >= 40 =>
-        println(s"You	have brewed	the	following coffee: Coffee at ${water.temperature} without milk")
+        println(s"You have brewed the following coffee: Coffee at ${water.temperature} without milk")
         Coffee(water, coffee)
       case (_, _) => throw BrewingException("The water is too cold")
     }

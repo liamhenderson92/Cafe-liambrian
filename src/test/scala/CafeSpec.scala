@@ -1,7 +1,4 @@
-import Cafe._
-import org.scalatest.{AsyncWordSpec, MustMatchers, WordSpec}
-
-import scala.concurrent.Future
+import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 class CafeSpec extends AsyncWordSpec with MustMatchers {
 
