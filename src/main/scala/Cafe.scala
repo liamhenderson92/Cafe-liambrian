@@ -1,3 +1,8 @@
+import java.util.concurrent.Executors
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Random, Success}
+
 case class Water(temperature: Double = 0)
 
 case class FrothingException(msg: String) extends Exception(msg)
@@ -14,8 +19,9 @@ final case class SemiSkimmedMilk() extends Milk
 trait Beans
 trait CoffeeBeans extends Beans
 final case class ArabicaBeans() extends CoffeeBeans
-final case class GroundCoffee()
+final case class RobustaBeans() extends CoffeeBeans
 
+final case class GroundCoffee()
 
 case class Coffee(water: Water, groundCoffee: GroundCoffee, milk: Option[FrothedMilk] = None) {
   def addMilk(frothedMilk: FrothedMilk): Coffee = this.copy(Water(water.temperature - 5), groundCoffee, Some(FrothedWholeMilk()))
@@ -23,25 +29,35 @@ case class Coffee(water: Water, groundCoffee: GroundCoffee, milk: Option[Frothed
 
 object Cafe extends App {
 
-  def heat(water: Water, temperature: Double = 40D): Water = {
+  implicit val ec : ExecutionContext = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
+
+  def heat(water: Water, temperature: Double = 40D): Future[Water] = Future {
+    Thread.sleep(Random.nextInt(2000))
+    println("Water heated to 40 Degrees.")
     water.copy(temperature)
   }
 
-  def grind(beans: Beans): GroundCoffee = {
+  def grind(beans: Beans): Future[GroundCoffee] = Future {
+    Thread.sleep(Random.nextInt(2000))
     beans match {
-      case ArabicaBeans() => GroundCoffee()
+      case ArabicaBeans() =>
+        println("Ground Coffee made from Arabica Beans.")
+        GroundCoffee()
       case _ => throw GrindingException("Incorrect Beans")
     }
   }
 
-  def frothMilk(milk: Milk): FrothedMilk = {
+  def frothMilk(milk: Milk): Future[FrothedMilk] = Future {
+    Thread.sleep(Random.nextInt(2000))
     milk match {
-      case WholeMilk() => FrothedWholeMilk()
+      case WholeMilk() =>
+        println("Frothed Milk made from WholeMilk.")
+        FrothedWholeMilk()
       case _ => throw FrothingException("You need to use Whole Milk")
     }
   }
 
-  def brew(water: Water, coffee: GroundCoffee, milk: Option[FrothedMilk] = None): Coffee = {
+  def brew(water: Water, coffee: GroundCoffee, milk: Option[FrothedMilk] = None): Future[Coffee] = Future {
     (water, milk) match {
       case (w, Some(FrothedWholeMilk())) if w.temperature >= 40 =>
         println(s"You	have brewed	the	following coffee: Coffee at ${water.temperature - 5} degrees with Whole Milk")
@@ -53,10 +69,32 @@ object Cafe extends App {
     }
   }
 
-  val groundCoffee = grind(ArabicaBeans())
-  val heatedWater = heat(Water(20))
-  val frothyMilk = frothMilk(WholeMilk())
+  def prepareCoffee(beans: Beans, water: Water, milk: Option[Milk]): Future[Coffee] = {
 
-  brew(heatedWater, groundCoffee, Some(frothyMilk))
-  brew(heatedWater, groundCoffee)
+    val groundCoffee = grind(beans)
+    val heatedWater = heat(water)
+
+
+    milk match {
+      case _ if milk.isDefined =>
+        val frothyMilk = frothMilk(milk.get)
+        (for {
+          ground <- groundCoffee
+          water <- heatedWater
+          foam <- frothyMilk
+        } yield brew(water, ground, Some(foam))).flatten
+      case _ =>
+        (for {
+          ground <- groundCoffee
+          water <- heatedWater
+        } yield brew(water, ground)).flatten
+
+    }
+  }
+  val brewedCoffee = prepareCoffee(ArabicaBeans(),Water(2),Some(WholeMilk()))
+
+  brewedCoffee.onComplete {
+    case Success(c) => c
+    case Failure(e) => println(e.getMessage)
+  }
 }
