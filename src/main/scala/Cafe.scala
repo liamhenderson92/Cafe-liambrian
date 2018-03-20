@@ -33,7 +33,7 @@ object Cafe extends App {
   def heat(water: Water, temperature: Double = 40D): Future[Water] = Future {
     println("Heating water...")
     Thread.sleep(Random.nextInt(2000))
-    println(Console.GREEN + "Water heated to 40 Degrees." + Console.RESET)
+    println(Console.GREEN + s"Water heated to $temperature degrees." + Console.RESET)
     water.copy(temperature)
   }
 
@@ -116,7 +116,7 @@ object Cafe extends App {
     }
   }
 
-  val brewedCoffee = prepareCoffee(ArabicaBeans(),Water(2),Some(WholeMilk()))
+  val brewedCoffee = prepareCoffee(ArabicaBeans(),Water(50),Some(WholeMilk()))
 
   brewedCoffee.onComplete {
     case Success(c) => c + sys.exit
