@@ -1,5 +1,4 @@
 import java.util.concurrent.Executors
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
@@ -121,6 +120,6 @@ object Cafe extends App {
 
   brewedCoffee.onComplete {
     case Success(c) => c + sys.exit
-    case Failure(e) => println(Console.RED + "Error: " + e.getMessage + Console.RESET)
+    case Failure(e) => println(Console.RED + "Error: " + e.getMessage + Console.RESET) + sys.exit
   }
 }
