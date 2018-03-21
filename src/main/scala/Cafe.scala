@@ -20,7 +20,7 @@ trait CoffeeBeans extends Beans
 final case class ArabicaBeans() extends CoffeeBeans
 final case class RobustaBeans() extends CoffeeBeans
 
-final case class GroundCoffee()
+final case class GroundCoffee(beans: CoffeeBeans)
 
 case class Coffee(water: Water, groundCoffee: GroundCoffee, milk: Option[FrothedMilk] = None) {
   def addMilk(frothedMilk: FrothedMilk): Coffee = this.copy(Water(water.temperature - 5), groundCoffee, Some(FrothedWholeMilk()))
@@ -43,7 +43,7 @@ object Cafe extends App {
     beans match {
       case ArabicaBeans() =>
         println(Console.GREEN + "Ground Coffee made from Arabica Beans." + Console.RESET)
-        GroundCoffee()
+        GroundCoffee(ArabicaBeans())
       case _ => throw GrindingException("Incorrect Beans")
     }
   }
@@ -74,29 +74,6 @@ object Cafe extends App {
 
   def prepareCoffee(beans: Beans, water: Water, milk: Option[Milk] = None): Future[Coffee] = {
 
-    print("                        (\n" +
-      "                          )     (\n" +
-      "                   ___...(-------)-....___\n" +
-      "               .-\"\"       )    (          \"\"-.\n" +
-      "         .-'``'|-._             )         _.-|\n" +
-      "        /  .--.|   `\"\"---...........---\"\"`   |\n" +
-      "       /  /    |                             |\n" +
-      "       |  |    |                             |\n" +
-      "        \\  \\   |            "+Console.RED+"CAFE"+Console.RESET+"             |\n" +
-      "         `\\ `\\ |          "+Console.RED+"LiamBrian"+Console.RESET+"          |\n" +
-      "           `\\ `|                             |\n" +
-      "           _/ /\\                             /\n" +
-      "          (__/  \\                           /\n" +
-      "       _..---\"\"` \\                         /`\"\"---.._\n" +
-      "    .-'           \\                       /          '-.\n" +
-      "   :               `-.__             __.-'              :\n" +
-      "   :                  ) \"\"---...---\"\" (                 :\n" +
-      "    '._               `\"--...___...--\"`              _.'\n" +
-      "      \\\"\"--..__                              __..--\"\"/\n" +
-      "       '._     \"\"\"----.....______.....----\"\"\"     _.'\n" +
-      "          `\"\"--..,,_____            _____,,..--\"\"`\n" +
-      "                        `\"\"\"----\"\"\"`\n\n")
-
     val groundCoffee = grind(beans)
     val heatedWater = heat(water)
 
@@ -119,7 +96,32 @@ object Cafe extends App {
   val brewedCoffee = prepareCoffee(ArabicaBeans(),Water(50),Some(WholeMilk()))
 
   brewedCoffee.onComplete {
-    case Success(c) => c + sys.exit
-    case Failure(e) => println(Console.RED + "Error: " + e.getMessage + Console.RESET) + sys.exit
+    case Success(_) =>
+      print("\n                        (\n" +
+        "                          )     (\n" +
+        "                   ___...(-------)-....___\n" +
+        "               .-\"\"       )    (          \"\"-.\n" +
+        "         .-'``'|-._             )         _.-|\n" +
+        "        /  .--.|   `\"\"---...........---\"\"`   |\n" +
+        "       /  /    |                             |\n" +
+        "       |  |    |                             |\n" +
+        "        \\  \\   |            "+Console.RED+"CAFE"+Console.RESET+"             |\n" +
+        "         `\\ `\\ |          "+Console.RED+"LiamBrian"+Console.RESET+"          |\n" +
+        "           `\\ `|                             |\n" +
+        "           _/ /\\                             /\n" +
+        "          (__/  \\                           /\n" +
+        "       _..---\"\"` \\                         /`\"\"---.._\n" +
+        "    .-'           \\                       /          '-.\n" +
+        "   :               `-.__             __.-'              :\n" +
+        "   :                  ) \"\"---...---\"\" (                 :\n" +
+        "    '._               `\"--...___...--\"`              _.'\n" +
+        "      \\\"\"--..__                              __..--\"\"/\n" +
+        "       '._     \"\"\"----.....______.....----\"\"\"     _.'\n" +
+        "          `\"\"--..,,_____            _____,,..--\"\"`\n" +
+        "                        `\"\"\"----\"\"\"`\n\n")
+      sys.exit
+    case Failure(e) =>
+      println(Console.MAGENTA + "Error: " + e.getMessage + Console.RESET)
+      sys.exit
   }
 }
